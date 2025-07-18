@@ -881,31 +881,55 @@
         }
       }
 
-      // 创建核弹爆炸音效（增强版）
+      // 创建核弹爆炸音效（超震撼版）
       function createNukeSound() {
         if (!soundEnabled || !audioContext) return;
 
-        // 核弹警告音（更响亮）
-        const warningOsc = audioContext.createOscillator();
-        const warningGain = audioContext.createGain();
+        // 第一阶段：巨大的"BOOM"爆炸声
+        const boomOsc = audioContext.createOscillator();
+        const boomGain = audioContext.createGain();
 
-        warningOsc.connect(warningGain);
-        warningGain.connect(audioContext.destination);
+        boomOsc.connect(boomGain);
+        boomGain.connect(audioContext.destination);
 
-        warningOsc.frequency.setValueAtTime(1200, audioContext.currentTime);
-        warningOsc.frequency.exponentialRampToValueAtTime(
-          300,
-          audioContext.currentTime + 0.3
+        boomOsc.frequency.setValueAtTime(80, audioContext.currentTime);
+        boomOsc.frequency.exponentialRampToValueAtTime(
+          20,
+          audioContext.currentTime + 0.5
         );
 
-        warningGain.gain.setValueAtTime(0.6, audioContext.currentTime);
-        warningGain.gain.exponentialRampToValueAtTime(
+        boomGain.gain.setValueAtTime(1.0, audioContext.currentTime);
+        boomGain.gain.exponentialRampToValueAtTime(
           0.01,
-          audioContext.currentTime + 0.3
+          audioContext.currentTime + 0.5
         );
 
-        warningOsc.start(audioContext.currentTime);
-        warningOsc.stop(audioContext.currentTime + 0.3);
+        boomOsc.start(audioContext.currentTime);
+        boomOsc.stop(audioContext.currentTime + 0.5);
+
+        // 第二阶段：核弹警告音（更响亮）
+        setTimeout(() => {
+          const warningOsc = audioContext.createOscillator();
+          const warningGain = audioContext.createGain();
+
+          warningOsc.connect(warningGain);
+          warningGain.connect(audioContext.destination);
+
+          warningOsc.frequency.setValueAtTime(1200, audioContext.currentTime);
+          warningOsc.frequency.exponentialRampToValueAtTime(
+            300,
+            audioContext.currentTime + 0.3
+          );
+
+          warningGain.gain.setValueAtTime(0.6, audioContext.currentTime);
+          warningGain.gain.exponentialRampToValueAtTime(
+            0.01,
+            audioContext.currentTime + 0.3
+          );
+
+          warningOsc.start(audioContext.currentTime);
+          warningOsc.stop(audioContext.currentTime + 0.3);
+        }, 100);
 
         // 核弹主爆炸音效（更震撼）
         setTimeout(() => {
@@ -970,6 +994,48 @@
             }, i * 50);
           }
         }, 300);
+
+        // 第三阶段：5秒耳鸣效果
+        setTimeout(() => {
+          const tinnitusPitch = 3000; // 高频耳鸣声
+          const tinnitusOsc = audioContext.createOscillator();
+          const tinnitusGain = audioContext.createGain();
+
+          tinnitusOsc.connect(tinnitusGain);
+          tinnitusGain.connect(audioContext.destination);
+
+          tinnitusOsc.frequency.setValueAtTime(
+            tinnitusPitch,
+            audioContext.currentTime
+          );
+
+          // 耳鸣音量从中等开始，逐渐减弱
+          tinnitusGain.gain.setValueAtTime(0.15, audioContext.currentTime);
+          tinnitusGain.gain.exponentialRampToValueAtTime(
+            0.05,
+            audioContext.currentTime + 2.0
+          );
+          tinnitusGain.gain.exponentialRampToValueAtTime(
+            0.01,
+            audioContext.currentTime + 5.0
+          );
+
+          tinnitusOsc.start(audioContext.currentTime);
+          tinnitusOsc.stop(audioContext.currentTime + 5.0);
+
+          // 添加轻微的音调波动，模拟真实耳鸣
+          const modulatorOsc = audioContext.createOscillator();
+          const modulatorGain = audioContext.createGain();
+
+          modulatorOsc.connect(modulatorGain);
+          modulatorGain.connect(tinnitusOsc.frequency);
+
+          modulatorOsc.frequency.setValueAtTime(2, audioContext.currentTime); // 2Hz波动
+          modulatorGain.gain.setValueAtTime(50, audioContext.currentTime); // 50Hz的频率波动
+
+          modulatorOsc.start(audioContext.currentTime);
+          modulatorOsc.stop(audioContext.currentTime + 5.0);
+        }, 1000); // 爆炸后1秒开始耳鸣
       }
 
       // 创建核弹获得音效

@@ -835,6 +835,101 @@
         }
       }
 
+      // 增加击杀计数
+      function addKill() {
+        nukeSystem.killStreak++;
+
+        // 检查是否获得核弹
+        if (nukeSystem.killStreak >= nukeSystem.requiredKills) {
+          nukeSystem.available++;
+          nukeSystem.killStreak = 0;
+
+          // 播放核弹获得音效
+          try {
+            createExplosionSound();
+          } catch (e) {}
+        }
+
+        updateNukeDisplay();
+      }
+
+      // 创建爆炸效果
+      function createExplosion(x, y, color) {
+        for (let i = 0; i < 8; i++) {
+          particles.push({
+            x: x,
+            y: y,
+            vx: (Math.random() - 0.5) * 8,
+            vy: (Math.random() - 0.5) * 8,
+            life: 30,
+            maxLife: 30,
+            color: color || "#ff6600",
+            size: Math.random() * 4 + 2,
+          });
+        }
+      }
+
+      // 更新粒子效果
+      function updateParticles() {
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const particle = particles[i];
+          particle.x += particle.vx;
+          particle.y += particle.vy;
+          particle.life--;
+
+          if (particle.life <= 0) {
+            particles.splice(i, 1);
+          }
+        }
+      }
+
+      // 绘制粒子效果
+      function drawParticles() {
+        particles.forEach((particle) => {
+          const alpha = particle.life / particle.maxLife;
+          ctx.globalAlpha = alpha;
+          ctx.fillStyle = particle.color;
+          ctx.beginPath();
+          ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        });
+      }
+
+      // 增加击杀计数
+      function addKill() {
+        nukeSystem.killStreak++;
+
+        // 检查是否获得核弹
+        if (nukeSystem.killStreak >= nukeSystem.requiredKills) {
+          nukeSystem.available++;
+          nukeSystem.killStreak = 0;
+
+          // 播放核弹获得音效
+          try {
+            createExplosionSound();
+          } catch (e) {}
+        }
+
+        updateNukeDisplay();
+      }
+
+      // 创建爆炸效果
+      function createExplosion(x, y, color) {
+        for (let i = 0; i < 8; i++) {
+          particles.push({
+            x: x,
+            y: y,
+            vx: (Math.random() - 0.5) * 8,
+            vy: (Math.random() - 0.5) * 8,
+            life: 30,
+            maxLife: 30,
+            color: color || "#ff6600",
+            size: Math.random() * 4 + 2,
+          });
+        }
+      }
+
       // 游戏主循环
       function gameLoop() {
         if (!gameRunning) return;
@@ -859,6 +954,10 @@
         updateEnemies();
         drawEnemies();
 
+        // 更新和绘制粒子效果
+        updateParticles();
+        drawParticles();
+
         // 更新和绘制子弹
         updateBullets();
         drawBullets();
@@ -876,12 +975,91 @@
         animationId = requestAnimationFrame(gameLoop);
       }
 
+      // 创建核弹爆炸音效（超震撼版）
+      function createNukeSound() {
+        if (!soundEnabled || !audioContext) return;
+
+        // 第一阶段：巨大的"BOOM"爆炸声
+        const boomOsc = audioContext.createOscillator();
+        const boomGain = audioContext.createGain();
+
+        boomOsc.connect(boomGain);
+        boomGain.connect(audioContext.destination);
+
+        boomOsc.frequency.setValueAtTime(80, audioContext.currentTime);
+        boomOsc.frequency.exponentialRampToValueAtTime(
+          20,
+          audioContext.currentTime + 0.5
+        );
+
+        boomGain.gain.setValueAtTime(1.0, audioContext.currentTime);
+        boomGain.gain.exponentialRampToValueAtTime(
+          0.01,
+          audioContext.currentTime + 0.5
+        );
+
+        boomOsc.start(audioContext.currentTime);
+        boomOsc.stop(audioContext.currentTime + 0.5);
+
+        // 第二阶段：核弹警告音
+        setTimeout(() => {
+          const warningOsc = audioContext.createOscillator();
+          const warningGain = audioContext.createGain();
+
+          warningOsc.connect(warningGain);
+          warningGain.connect(audioContext.destination);
+
+          warningOsc.frequency.setValueAtTime(1200, audioContext.currentTime);
+          warningOsc.frequency.exponentialRampToValueAtTime(
+            300,
+            audioContext.currentTime + 0.3
+          );
+
+          warningGain.gain.setValueAtTime(0.6, audioContext.currentTime);
+          warningGain.gain.exponentialRampToValueAtTime(
+            0.01,
+            audioContext.currentTime + 0.3
+          );
+
+          warningOsc.start(audioContext.currentTime);
+          warningOsc.stop(audioContext.currentTime + 0.3);
+        }, 100);
+
+        // 第三阶段：5秒耳鸣效果
+        setTimeout(() => {
+          const tinnitusPitch = 3000;
+          const tinnitusOsc = audioContext.createOscillator();
+          const tinnitusGain = audioContext.createGain();
+
+          tinnitusOsc.connect(tinnitusGain);
+          tinnitusGain.connect(audioContext.destination);
+
+          tinnitusOsc.frequency.setValueAtTime(
+            tinnitusPitch,
+            audioContext.currentTime
+          );
+
+          tinnitusGain.gain.setValueAtTime(0.15, audioContext.currentTime);
+          tinnitusGain.gain.exponentialRampToValueAtTime(
+            0.05,
+            audioContext.currentTime + 2.0
+          );
+          tinnitusGain.gain.exponentialRampToValueAtTime(
+            0.01,
+            audioContext.currentTime + 5.0
+          );
+
+          tinnitusOsc.start(audioContext.currentTime);
+          tinnitusOsc.stop(audioContext.currentTime + 5.0);
+        }, 1000);
+      }
+
       // 使用核弹
       function useNuke() {
         if (nukeSystem.available <= 0 || nukeSystem.isActive) return;
 
         try {
-          createExplosionSound();
+          createNukeSound();
         } catch (e) {}
 
         nukeSystem.available--;
@@ -1090,8 +1268,53 @@
             const bullet = player.bullets[i];
             bullet.y -= bullet.speed;
 
+            // 移除超出画布的子弹
             if (bullet.y + bullet.height < 0) {
               player.bullets.splice(i, 1);
+              continue;
+            }
+
+            // 检测子弹与敌人的碰撞
+            for (let j = enemies.length - 1; j >= 0; j--) {
+              const enemy = enemies[j];
+              if (checkCollision(bullet, enemy)) {
+                // 移除子弹
+                player.bullets.splice(i, 1);
+
+                // 处理BOSS敌人
+                if (enemy.isBoss) {
+                  enemy.health--;
+                  // 创建击中特效
+                  createExplosion(
+                    bullet.x + bullet.width / 2,
+                    bullet.y + bullet.height / 2,
+                    "#ffff00"
+                  );
+
+                  // BOSS死亡
+                  if (enemy.health <= 0) {
+                    try {
+                      createExplosionSound();
+                    } catch (e) {}
+
+                    enemies.splice(j, 1);
+                    score += 500; // BOSS给更多分数
+                    addKill(); // 增加击杀计数
+                  }
+                } else {
+                  // 普通敌人处理
+                  try {
+                    createExplosionSound();
+                  } catch (e) {}
+
+                  enemies.splice(j, 1);
+                  score += 100; // 普通敌人分数
+                  addKill(); // 增加击杀计数
+                }
+
+                updateScore();
+                break; // 子弹已被移除，跳出敌人循环
+              }
             }
           }
         });
