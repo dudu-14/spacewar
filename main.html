@@ -2158,12 +2158,90 @@
       // 绘制敌人 (超爽游模式：特殊BOSS效果)
       function drawEnemies() {
         enemies.forEach((enemy) => {
+          // 绘制敌机主体（向下飞行的飞机形状）
           ctx.fillStyle = enemy.color;
-          ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+          ctx.beginPath();
 
-          // 绘制敌人特征
-          ctx.fillStyle = "#000";
-          ctx.fillRect(enemy.x + 5, enemy.y + 5, enemy.width - 10, 5);
+          // 敌机机身（椭圆形）
+          const centerX = enemy.x + enemy.width / 2;
+          const centerY = enemy.y + enemy.height / 2;
+          const bodyWidth = enemy.width * 0.3;
+          const bodyHeight = enemy.height * 0.8;
+
+          ctx.ellipse(
+            centerX,
+            centerY,
+            bodyWidth / 2,
+            bodyHeight / 2,
+            0,
+            0,
+            Math.PI * 2
+          );
+          ctx.fill();
+
+          // 绘制敌机机翼
+          ctx.fillStyle = enemy.color;
+          ctx.beginPath();
+          // 主翼（向下飞行，所以机翼在中上部）
+          ctx.moveTo(enemy.x + enemy.width * 0.1, enemy.y + enemy.height * 0.4);
+          ctx.lineTo(enemy.x + enemy.width * 0.9, enemy.y + enemy.height * 0.4);
+          ctx.lineTo(enemy.x + enemy.width * 0.8, enemy.y + enemy.height * 0.6);
+          ctx.lineTo(enemy.x + enemy.width * 0.2, enemy.y + enemy.height * 0.6);
+          ctx.closePath();
+          ctx.fill();
+
+          // 尾翼（在机头位置，因为是向下飞行）
+          ctx.beginPath();
+          ctx.moveTo(
+            enemy.x + enemy.width * 0.35,
+            enemy.y + enemy.height * 0.05
+          );
+          ctx.lineTo(
+            enemy.x + enemy.width * 0.65,
+            enemy.y + enemy.height * 0.05
+          );
+          ctx.lineTo(
+            enemy.x + enemy.width * 0.6,
+            enemy.y + enemy.height * 0.15
+          );
+          ctx.lineTo(
+            enemy.x + enemy.width * 0.4,
+            enemy.y + enemy.height * 0.15
+          );
+          ctx.closePath();
+          ctx.fill();
+
+          // 绘制敌机驾驶舱（在机尾位置）
+          ctx.fillStyle = "#ff4444";
+          ctx.beginPath();
+          ctx.ellipse(
+            centerX,
+            enemy.y + enemy.height * 0.75,
+            bodyWidth / 3,
+            bodyHeight / 6,
+            0,
+            0,
+            Math.PI * 2
+          );
+          ctx.fill();
+
+          // 绘制敌机引擎喷火效果（向上喷射）
+          ctx.fillStyle = "#ff6600";
+          ctx.beginPath();
+          ctx.moveTo(enemy.x + enemy.width * 0.4, enemy.y);
+          ctx.lineTo(enemy.x + enemy.width * 0.6, enemy.y);
+          ctx.lineTo(centerX, enemy.y - 12);
+          ctx.closePath();
+          ctx.fill();
+
+          // 引擎火焰内核
+          ctx.fillStyle = "#ffff00";
+          ctx.beginPath();
+          ctx.moveTo(enemy.x + enemy.width * 0.45, enemy.y);
+          ctx.lineTo(enemy.x + enemy.width * 0.55, enemy.y);
+          ctx.lineTo(centerX, enemy.y - 8);
+          ctx.closePath();
+          ctx.fill();
 
           // BOSS特殊效果
           if (enemy.isBoss) {
