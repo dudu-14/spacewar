@@ -1639,100 +1639,27 @@
             ctx.stroke();
           }
 
-          // 绘制飞机主体（更真实的飞机形状）
+          // 绘制飞船主体
           ctx.fillStyle = player.color;
           ctx.beginPath();
-
-          // 飞机机身（椭圆形）
-          const centerX = player.x + player.width / 2;
-          const centerY = player.y + player.height / 2;
-          const bodyWidth = player.width * 0.3;
-          const bodyHeight = player.height * 0.8;
-
-          ctx.ellipse(
-            centerX,
-            centerY,
-            bodyWidth / 2,
-            bodyHeight / 2,
-            0,
-            0,
-            Math.PI * 2
-          );
-          ctx.fill();
-
-          // 绘制机翼
-          ctx.fillStyle = player.color;
-          ctx.beginPath();
-          // 主翼
-          ctx.moveTo(
-            player.x + player.width * 0.1,
-            player.y + player.height * 0.4
-          );
-          ctx.lineTo(
-            player.x + player.width * 0.9,
-            player.y + player.height * 0.4
-          );
-          ctx.lineTo(
-            player.x + player.width * 0.8,
-            player.y + player.height * 0.6
-          );
-          ctx.lineTo(
-            player.x + player.width * 0.2,
-            player.y + player.height * 0.6
-          );
+          ctx.moveTo(player.x + player.width / 2, player.y);
+          ctx.lineTo(player.x + player.width, player.y + player.height);
+          ctx.lineTo(player.x, player.y + player.height);
           ctx.closePath();
           ctx.fill();
 
-          // 尾翼
-          ctx.beginPath();
-          ctx.moveTo(
-            player.x + player.width * 0.35,
-            player.y + player.height * 0.85
-          );
-          ctx.lineTo(
-            player.x + player.width * 0.65,
-            player.y + player.height * 0.85
-          );
-          ctx.lineTo(
-            player.x + player.width * 0.6,
-            player.y + player.height * 0.95
-          );
-          ctx.lineTo(
-            player.x + player.width * 0.4,
-            player.y + player.height * 0.95
-          );
-          ctx.closePath();
-          ctx.fill();
-
-          // 绘制机头（驾驶舱）
-          ctx.fillStyle = "#ffffff";
-          ctx.beginPath();
-          ctx.ellipse(
-            centerX,
-            player.y + player.height * 0.25,
-            bodyWidth / 3,
-            bodyHeight / 6,
-            0,
-            0,
-            Math.PI * 2
-          );
-          ctx.fill();
-
-          // 绘制引擎喷火效果
+          // 绘制飞船引擎效果
           ctx.fillStyle = "#ff6600";
           ctx.beginPath();
-          ctx.moveTo(player.x + player.width * 0.4, player.y + player.height);
-          ctx.lineTo(player.x + player.width * 0.6, player.y + player.height);
-          ctx.lineTo(centerX, player.y + player.height + 12);
-          ctx.closePath();
-          ctx.fill();
-
-          // 引擎火焰内核（更亮的颜色）
-          ctx.fillStyle = "#ffff00";
-          ctx.beginPath();
-          ctx.moveTo(player.x + player.width * 0.45, player.y + player.height);
-          ctx.lineTo(player.x + player.width * 0.55, player.y + player.height);
-          ctx.lineTo(centerX, player.y + player.height + 8);
+          ctx.moveTo(player.x + player.width / 3, player.y + player.height);
+          ctx.lineTo(
+            player.x + (player.width * 2) / 3,
+            player.y + player.height
+          );
+          ctx.lineTo(
+            player.x + player.width / 2,
+            player.y + player.height + 10
+          );
           ctx.closePath();
           ctx.fill();
 
